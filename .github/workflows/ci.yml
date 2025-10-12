@@ -42,12 +42,12 @@ jobs:
 
       - name: Vet
         run: go vet ./...
-
+      - name: Install golangci-lint
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
       - name: Lint (golangci-lint)
-        uses: golangci/golangci-lint-action@v5
-        with:
-          version: latest
-          args: --timeout=3m
+        run: golangci-lint run --timeout=3m
 
       - name: Build
         run: go build ./...
