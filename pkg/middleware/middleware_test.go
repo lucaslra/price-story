@@ -17,7 +17,9 @@ func TestLoggerMiddleware(t *testing.T) {
 
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, "ok")
+		if _, err := io.WriteString(w, "ok"); err != nil {
+			t.Fatalf("write error: %v", err)
+		}
 	})
 
 	rr := httptest.NewRecorder()

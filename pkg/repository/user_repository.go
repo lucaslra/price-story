@@ -22,7 +22,7 @@ func (r *UserRepository) ListUsers() ([]models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var users []models.User
 	for rows.Next() {

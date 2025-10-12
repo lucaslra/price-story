@@ -22,7 +22,7 @@ func (r *PricePointRepository) ListPricePoints() ([]models.PricePoint, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var points []models.PricePoint
 	for rows.Next() {

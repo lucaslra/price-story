@@ -15,7 +15,7 @@ func TestDeleteProduct(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sqlmock.New error: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := NewProductRepository(db)
 	id := "p1"
@@ -51,7 +51,7 @@ func TestCreateProduct_WithoutUpdatedUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sqlmock.New error: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := NewProductRepository(db)
 	p := models.Product{

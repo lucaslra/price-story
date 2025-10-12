@@ -15,7 +15,7 @@ func TestEnsureUserByEmail_ReturnsExisting(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sqlmock.New error: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := NewUserRepository(db)
 	email := "test@example.com"
@@ -41,7 +41,7 @@ func TestEnsureUserByEmail_CreatesWhenMissing(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sqlmock.New error: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := NewUserRepository(db)
 	email := "new@example.com"
@@ -72,7 +72,7 @@ func TestUpdateUser_ReturnsUpdated(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sqlmock.New error: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := NewUserRepository(db)
 	id := "u3"

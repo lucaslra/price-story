@@ -22,7 +22,7 @@ func (r *PriceStoryRepository) ListPriceStories() ([]models.PriceStory, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var stories []models.PriceStory
 	for rows.Next() {

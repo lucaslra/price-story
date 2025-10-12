@@ -13,7 +13,7 @@ func TestDeletePriceStory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sqlmock.New error: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	repo := NewPriceStoryRepository(db)
 	id := "ps1"

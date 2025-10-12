@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running pre-commit checks: gofmt, golangci-lint, tests"
+
+# Format Go files (simplify + write), then re-add to staging if changed
+go_files=$(git ls-files '*.go' || true)
+if [ -n "$go_files" ]; then
+  unformatted=$(gofmt -s -l $go_files || true)
+  if [ -n "$unformatted" ]; then
+    echo "Formatting Go files:" 
+    echo "$unformatted"
+    gofmt -s -w $unformatted
+    git add $unformatted
+  fi
+else
+  echo "No Go files detected by git ls-files"
+fi
+
+# Ensure golangci-lint is available; install with current Go toolchain if missing
+if ! command -v golangci-lint >/dev/null 2>&1; then
+  echo "golangci-lint not found. Installing via 'go install ...@latest'"
+  if ! command -v go >/dev/null 2>&1; then
+    echo "Go toolchain not found in PATH. Aborting."
+    exit 1
+  fi
+  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  export PATH="$(go env GOPATH)/bin:$PATH"
+fi
+
+echo "Running golangci-lint ..."
+golangci-lint run ./...
+
+# Run tests using Makefile target if available, fallback to 'go test'
+echo "Running tests ..."
+if command -v make >/dev/null 2>&1 && grep -qE '^test:' Makefile 2>/dev/null; then
+  make test
+else
+  go test ./...
+fi
+
+echo "Pre-commit checks passed. Proceeding with commit."

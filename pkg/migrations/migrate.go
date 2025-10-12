@@ -127,7 +127,7 @@ func (m *Migrator) getAppliedMigrations() (map[int64]bool, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to query applied migrations: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var version int64
@@ -173,21 +173,21 @@ func (m *Migrator) Up() error {
 		// Mark as dirty
 		_, err = tx.Exec("INSERT INTO schema_migrations (version, dirty) VALUES ($1, TRUE)", migration.Version)
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return fmt.Errorf("failed to mark migration %d as dirty: %w", migration.Version, err)
 		}
 
 		// Execute migration
 		_, err = tx.Exec(migration.UpSQL)
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return fmt.Errorf("failed to execute migration %d: %w", migration.Version, err)
 		}
 
 		// Mark as clean
 		_, err = tx.Exec("UPDATE schema_migrations SET dirty = FALSE WHERE version = $1", migration.Version)
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return fmt.Errorf("failed to mark migration %d as clean: %w", migration.Version, err)
 		}
 
@@ -247,14 +247,14 @@ func (m *Migrator) Down() error {
 	// Execute rollback
 	_, err = tx.Exec(targetMigration.DownSQL)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return fmt.Errorf("failed to execute rollback %d: %w", targetMigration.Version, err)
 	}
 
 	// Remove from migrations table
 	_, err = tx.Exec("DELETE FROM schema_migrations WHERE version = $1", targetMigration.Version)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return fmt.Errorf("failed to remove migration %d from schema_migrations: %w", targetMigration.Version, err)
 	}
 

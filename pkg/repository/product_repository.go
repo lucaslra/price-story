@@ -22,7 +22,7 @@ func (r *ProductRepository) ListProducts() ([]models.Product, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var products []models.Product
 	for rows.Next() {

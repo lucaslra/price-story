@@ -38,7 +38,9 @@ func NewHandler(db *sql.DB) *Handler {
 func (h *Handler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"status": "ok"}); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // ----- Users -----
@@ -52,7 +54,9 @@ func (h *Handler) GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to retrieve users", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(map[string]interface{}{"users": users})
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{"users": users}); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // GetUserHandler returns a specific user by ID
@@ -74,7 +78,9 @@ func (h *Handler) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(user)
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // CreateUserHandler creates a new user
@@ -96,7 +102,9 @@ func (h *Handler) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(created)
+	if err := json.NewEncoder(w).Encode(created); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // UpdateUserHandler updates an existing user
@@ -127,7 +135,9 @@ func (h *Handler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(updated)
+	if err := json.NewEncoder(w).Encode(updated); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // DeleteUserHandler deletes a user
@@ -162,7 +172,9 @@ func (h *Handler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to retrieve products", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(map[string]interface{}{"products": products})
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{"products": products}); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // GetProductHandler returns a specific product by ID
@@ -184,7 +196,9 @@ func (h *Handler) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(product)
+	if err := json.NewEncoder(w).Encode(product); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // CreateProductHandler creates a new product
@@ -234,7 +248,9 @@ func (h *Handler) CreateProductHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(created)
+	if err := json.NewEncoder(w).Encode(created); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // UpdateProductHandler updates an existing product
@@ -291,7 +307,9 @@ func (h *Handler) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(updated)
+	if err := json.NewEncoder(w).Encode(updated); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // DeleteProductHandler deletes a product
@@ -326,7 +344,9 @@ func (h *Handler) GetPriceStoriesHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Failed to retrieve price stories", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(map[string]interface{}{"priceStories": stories})
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{"priceStories": stories}); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // GetPriceStoryHandler returns a specific price story by ID
@@ -348,7 +368,9 @@ func (h *Handler) GetPriceStoryHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(ps)
+	if err := json.NewEncoder(w).Encode(ps); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // CreatePriceStoryHandler creates a new price story
@@ -386,7 +408,9 @@ func (h *Handler) CreatePriceStoryHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(created)
+	if err := json.NewEncoder(w).Encode(created); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // UpdatePriceStoryHandler updates an existing price story
@@ -432,7 +456,9 @@ func (h *Handler) UpdatePriceStoryHandler(w http.ResponseWriter, r *http.Request
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(updated)
+	if err := json.NewEncoder(w).Encode(updated); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // DeletePriceStoryHandler deletes a price story
@@ -467,7 +493,9 @@ func (h *Handler) GetPricePointsHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Failed to retrieve price points", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(map[string]interface{}{"pricePoints": points})
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{"pricePoints": points}); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // GetPricePointHandler returns a specific price point by ID
@@ -489,7 +517,9 @@ func (h *Handler) GetPricePointHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(pp)
+	if err := json.NewEncoder(w).Encode(pp); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // CreatePricePointHandler creates a new price point
@@ -532,7 +562,9 @@ func (h *Handler) CreatePricePointHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(created)
+	if err := json.NewEncoder(w).Encode(created); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // UpdatePricePointHandler updates an existing price point
@@ -582,7 +614,9 @@ func (h *Handler) UpdatePricePointHandler(w http.ResponseWriter, r *http.Request
 		}
 		return
 	}
-	json.NewEncoder(w).Encode(updated)
+	if err := json.NewEncoder(w).Encode(updated); err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }
 
 // DeletePricePointHandler deletes a price point
