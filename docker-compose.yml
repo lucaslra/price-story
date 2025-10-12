@@ -20,6 +20,22 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  frontend:
+    image: node:18-alpine
+    container_name: price-story-frontend
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      # Point Vite dev proxy to the backend service in Docker network
+      VITE_API_PROXY_TARGET: http://app:8080
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm ci && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    depends_on:
+      app:
+        condition: service_started
   postgres:
     image: postgres:15-alpine
     container_name: price-story-postgres

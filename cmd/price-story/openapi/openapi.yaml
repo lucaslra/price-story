@@ -612,15 +612,47 @@ components:
           format: email
         password_hash:
           type: string
+        preferred_currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+        decimal_places:
+          type: integer
+          minimum: 0
+          maximum: 4
+          description: JPY requires 0 decimal places
+        thousand_separator:
+          type: string
+          enum: [",", ".", " "]
+        currency_symbol_placement:
+          type: string
+          enum: ["before", "after"]
     UserCreate:
       type: object
-      required: [email, password_hash]
+      required: [preferred_currency, decimal_places, thousand_separator, currency_symbol_placement, email, password_hash]
       properties:
         email:
           type: string
           format: email
         password_hash:
           type: string
+        preferred_currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+        decimal_places:
+          type: integer
+          minimum: 0
+          maximum: 4
+          description: JPY requires 0 decimal places
+        thousand_separator:
+          type: string
+          enum: [",", ".", " "]
+        currency_symbol_placement:
+          type: string
+          enum: ["before", "after"]
     Product:
       type: object
       properties:
@@ -721,13 +753,29 @@ components:
           format: uuid
     UserUpdate:
       type: object
-      required: [email, password_hash]
+      required: [preferred_currency, decimal_places, thousand_separator, currency_symbol_placement, email, password_hash]
       properties:
         email:
           type: string
           format: email
         password_hash:
           type: string
+        preferred_currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+        decimal_places:
+          type: integer
+          minimum: 0
+          maximum: 4
+          description: JPY requires 0 decimal places
+        thousand_separator:
+          type: string
+          enum: [",", ".", " "]
+        currency_symbol_placement:
+          type: string
+          enum: ["before", "after"]
     ProductUpdate:
       type: object
       required: [product_name, product_url]

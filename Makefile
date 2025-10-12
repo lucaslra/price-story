@@ -28,7 +28,7 @@ docker-build:
 	docker-compose build app
 
 docker-up:
-	docker-compose up -d postgres app
+	docker-compose up -d postgres app frontend
 
 docker-down:
 	docker-compose down
@@ -37,7 +37,7 @@ docker-logs:
 	docker-compose logs -f app
 
 docker-restart:
-	docker-compose down && docker-compose up -d postgres app
+	docker-compose down && docker-compose up -d postgres app frontend
 
 
 # Run tests

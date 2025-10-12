@@ -21,8 +21,8 @@ func TestEnsureUserByEmail_ReturnsExisting(t *testing.T) {
 	email := "test@example.com"
 	mock.ExpectQuery(regexp.QuoteMeta(queries.GetUserByEmail)).
 		WithArgs(email).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password_hash"}).
-			AddRow("u1", email, "hash"))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password_hash", "preferred_currency", "decimal_places", "thousand_separator", "currency_symbol_placement"}).
+			AddRow("u1", email, "hash", "USD", 2, ",", "before"))
 
 	u, err := repo.EnsureUserByEmail(email, "irrelevant")
 	if err != nil {
@@ -51,9 +51,9 @@ func TestEnsureUserByEmail_CreatesWhenMissing(t *testing.T) {
 		WillReturnError(sql.ErrNoRows)
 
 	mock.ExpectQuery(regexp.QuoteMeta(queries.InsertUserReturning)).
-		WithArgs(email, pass).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password_hash"}).
-			AddRow("u2", email, pass))
+		WithArgs(email, pass, "USD", 2, ",", "before").
+		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password_hash", "preferred_currency", "decimal_places", "thousand_separator", "currency_symbol_placement"}).
+			AddRow("u2", email, pass, "USD", 2, ",", "before"))
 
 	u, err := repo.EnsureUserByEmail(email, pass)
 	if err != nil {
@@ -79,9 +79,9 @@ func TestUpdateUser_ReturnsUpdated(t *testing.T) {
 	u := models.User{Email: "e@x.com", PasswordHash: "h"}
 
 	mock.ExpectQuery(regexp.QuoteMeta(queries.UpdateUserReturning)).
-		WithArgs(u.Email, u.PasswordHash, id).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password_hash"}).
-			AddRow(id, u.Email, u.PasswordHash))
+		WithArgs(u.Email, u.PasswordHash, "", 0, "", "", id).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password_hash", "preferred_currency", "decimal_places", "thousand_separator", "currency_symbol_placement"}).
+			AddRow(id, u.Email, u.PasswordHash, "", 0, "", ""))
 
 	got, err := repo.UpdateUser(id, u)
 	if err != nil {

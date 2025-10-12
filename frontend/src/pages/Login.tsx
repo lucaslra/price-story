@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { get, post } from '@/api/client'
 import { useAuth } from '@/auth/AuthContext'
@@ -20,6 +20,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
+  const [preferredCurrency, setPreferredCurrency] = useState('USD')
+  const [decimalPlaces, setDecimalPlaces] = useState<number>(2)
+  const [thousandSeparator, setThousandSeparator] = useState<string>(',')
+  const [symbolPlacement, setSymbolPlacement] = useState<'before' | 'after'>('before')
+
+  const currencyOptions = useMemo(
+    () => ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY'],
+    []
+  )
+
+  useEffect(() => {
+    // Adjust decimal places for JPY
+    if (preferredCurrency === 'JPY') {
+      setDecimalPlaces(0)
+    } else if (decimalPlaces === 0) {
+      setDecimalPlaces(2)
+    }
+  }, [preferredCurrency, decimalPlaces])
 
   useEffect(() => {
     let isMounted = true
@@ -52,9 +70,39 @@ export default function LoginPage() {
     setCreating(true)
     setCreateError(null)
     try {
-      const created = await post<{ email: string; password_hash: string }, User>('/users', {
+      if (!/^[A-Z]{3}$/.test(preferredCurrency)) {
+        throw new Error('Preferred currency must be a 3-letter uppercase code')
+      }
+      if (preferredCurrency === 'JPY' && decimalPlaces !== 0) {
+        throw new Error('JPY requires 0 decimal places')
+      }
+      if (decimalPlaces < 0 || decimalPlaces > 4) {
+        throw new Error('Decimal places must be between 0 and 4')
+      }
+      if (![',', '.', ' '].includes(thousandSeparator)) {
+        throw new Error('Thousand separator must be one of ",", ".", or space')
+      }
+      if (!['before', 'after'].includes(symbolPlacement)) {
+        throw new Error('Currency symbol placement must be "before" or "after"')
+      }
+
+      const created = await post<
+        {
+          email: string
+          password_hash: string
+          preferred_currency: string
+          decimal_places: number
+          thousand_separator: string
+          currency_symbol_placement: 'before' | 'after'
+        },
+        User
+      >('/users', {
         email,
-        password_hash: password
+        password_hash: password,
+        preferred_currency: preferredCurrency,
+        decimal_places: decimalPlaces,
+        thousand_separator: thousandSeparator,
+        currency_symbol_placement: symbolPlacement
       })
       login(created)
       navigate(from, { replace: true })
@@ -99,7 +147,7 @@ export default function LoginPage() {
 
         <section>
           <h2 style={{ fontSize: 18 }}>Create new user</h2>
-          <form onSubmit={handleCreate} style={{ display: 'grid', gap: 8, maxWidth: 360 }}>
+          <form onSubmit={handleCreate} style={{ display: 'grid', gap: 8, maxWidth: 480 }}>
             <label>
               <div>Email</div>
               <input
@@ -122,6 +170,62 @@ export default function LoginPage() {
                 style={{ width: '100%' }}
               />
             </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <label>
+                <div>Preferred currency</div>
+                <select
+                  value={preferredCurrency}
+                  onChange={(e) => setPreferredCurrency(e.target.value)}
+                  required
+                  style={{ width: '100%' }}
+                >
+                  {currencyOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <div>Decimal places</div>
+                <input
+                  type="number"
+                  value={decimalPlaces}
+                  onChange={(e) => setDecimalPlaces(Number(e.target.value))}
+                  min={preferredCurrency === 'JPY' ? 0 : 0}
+                  max={preferredCurrency === 'JPY' ? 0 : 4}
+                  required
+                  style={{ width: '100%' }}
+                />
+              </label>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <label>
+                <div>Thousand separator</div>
+                <select
+                  value={thousandSeparator}
+                  onChange={(e) => setThousandSeparator(e.target.value)}
+                  required
+                  style={{ width: '100%' }}
+                >
+                  <option value="," label="," />
+                  <option value="." label="." />
+                  <option value=" " label="Space" />
+                </select>
+              </label>
+              <label>
+                <div>Currency symbol placement</div>
+                <select
+                  value={symbolPlacement}
+                  onChange={(e) => setSymbolPlacement(e.target.value as 'before' | 'after')}
+                  required
+                  style={{ width: '100%' }}
+                >
+                  <option value="before">Before</option>
+                  <option value="after">After</option>
+                </select>
+              </label>
+            </div>
             <div>
               <button type="submit" disabled={creating}>
                 {creating ? 'Creating…' : 'Create & Sign in'}

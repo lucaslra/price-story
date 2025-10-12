@@ -27,7 +27,7 @@ func (r *UserRepository) ListUsers() ([]models.User, error) {
 	var users []models.User
 	for rows.Next() {
 		var u models.User
-		if err := rows.Scan(&u.ID, &u.Email, &u.PasswordHash); err != nil {
+		if err := rows.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PreferredCurrency, &u.DecimalPlaces, &u.ThousandSeparator, &u.CurrencySymbolPlacement); err != nil {
 			return nil, err
 		}
 		users = append(users, u)
@@ -38,21 +38,23 @@ func (r *UserRepository) ListUsers() ([]models.User, error) {
 // GetUser retrieves a user by ID
 func (r *UserRepository) GetUser(id string) (models.User, error) {
 	var u models.User
-	err := r.db.QueryRow(queries.GetUserByID, id).Scan(&u.ID, &u.Email, &u.PasswordHash)
+	err := r.db.QueryRow(queries.GetUserByID, id).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PreferredCurrency, &u.DecimalPlaces, &u.ThousandSeparator, &u.CurrencySymbolPlacement)
 	return u, err
 }
 
 // GetUserByEmail retrieves a user by email
 func (r *UserRepository) GetUserByEmail(email string) (models.User, error) {
 	var u models.User
-	err := r.db.QueryRow(queries.GetUserByEmail, email).Scan(&u.ID, &u.Email, &u.PasswordHash)
+	err := r.db.QueryRow(queries.GetUserByEmail, email).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PreferredCurrency, &u.DecimalPlaces, &u.ThousandSeparator, &u.CurrencySymbolPlacement)
 	return u, err
 }
 
 // CreateUser creates a new user
 func (r *UserRepository) CreateUser(u models.User) (models.User, error) {
 	// Return created record
-	err := r.db.QueryRow(queries.InsertUserReturning, u.Email, u.PasswordHash).Scan(&u.ID, &u.Email, &u.PasswordHash)
+	err := r.db.QueryRow(queries.InsertUserReturning, u.Email, u.PasswordHash, u.PreferredCurrency, u.DecimalPlaces, u.ThousandSeparator, u.CurrencySymbolPlacement).Scan(
+		&u.ID, &u.Email, &u.PasswordHash, &u.PreferredCurrency, &u.DecimalPlaces, &u.ThousandSeparator, &u.CurrencySymbolPlacement,
+	)
 	return u, err
 }
 
@@ -63,7 +65,15 @@ func (r *UserRepository) EnsureUserByEmail(email, passwordHash string) (models.U
 		return u, nil
 	}
 	if err == sql.ErrNoRows {
-		return r.CreateUser(models.User{Email: email, PasswordHash: passwordHash})
+		// Create with sensible defaults
+		return r.CreateUser(models.User{
+			Email:                   email,
+			PasswordHash:            passwordHash,
+			PreferredCurrency:       "USD",
+			DecimalPlaces:           2,
+			ThousandSeparator:       ",",
+			CurrencySymbolPlacement: "before",
+		})
 	}
 	return models.User{}, err
 }
@@ -71,7 +81,11 @@ func (r *UserRepository) EnsureUserByEmail(email, passwordHash string) (models.U
 // UpdateUser updates an existing user by ID
 func (r *UserRepository) UpdateUser(id string, u models.User) (models.User, error) {
 	u.ID = id
-	err := r.db.QueryRow(queries.UpdateUserReturning, u.Email, u.PasswordHash, id).Scan(&u.ID, &u.Email, &u.PasswordHash)
+	err := r.db.QueryRow(queries.UpdateUserReturning,
+		u.Email, u.PasswordHash,
+		u.PreferredCurrency, u.DecimalPlaces, u.ThousandSeparator, u.CurrencySymbolPlacement,
+		id,
+	).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.PreferredCurrency, &u.DecimalPlaces, &u.ThousandSeparator, &u.CurrencySymbolPlacement)
 	return u, err
 }
 

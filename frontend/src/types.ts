@@ -2,6 +2,10 @@ export interface User {
   id: string
   email: string
   password_hash: string
+  preferred_currency: string
+  decimal_places: number
+  thousand_separator: string
+  currency_symbol_placement: 'before' | 'after'
 }
 
 export interface Product {

@@ -34,9 +34,21 @@ export default function PriceStoriesPage() {
 
   return (
     <div style={{ padding: 24, fontFamily: 'system-ui, sans-serif' }}>
-      <h1 style={{ marginBottom: 16 }}>Price Stories</h1>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Price Stories</h1>
+        <Link to="/price-stories/new">New Price Story</Link>
+      </div>
       {stories.length === 0 ? (
-        <p>No price stories found.</p>
+        <p>
+          No price stories found. <Link to="/price-stories/new">Create one</Link>
+        </p>
       ) : (
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 12 }}>
           {stories.map((ps) => (

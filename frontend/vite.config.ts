@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'node:path'
+import * as path from 'node:path'
 
 export default defineConfig({
   plugins: [react()],
@@ -10,11 +10,12 @@ export default defineConfig({
     }
   },
   server: {
+    host: true,
     port: 5173,
     proxy: {
       // Proxy API requests to the Go backend during development
-      '/health': 'http://localhost:8080',
-      '/api': 'http://localhost:8080'
+      '/health': process.env.VITE_API_PROXY_TARGET || 'http://localhost:8080',
+      '/api': process.env.VITE_API_PROXY_TARGET || 'http://localhost:8080'
     }
   }
 })

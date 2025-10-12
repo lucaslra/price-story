@@ -15,3 +15,13 @@ export async function post<TBody extends object, TResp>(path: string, body: TBod
   if (!res.ok) throw new Error(`POST ${path} failed: ${res.status}`)
   return res.json() as Promise<TResp>
 }
+
+export async function put<TBody extends object, TResp>(path: string, body: TBody): Promise<TResp> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  if (!res.ok) throw new Error(`PUT ${path} failed: ${res.status}`)
+  return res.json() as Promise<TResp>
+}

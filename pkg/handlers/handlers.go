@@ -86,16 +86,38 @@ func (h *Handler) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 // CreateUserHandler creates a new user
 func (h *Handler) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var u models.User
-	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+	var payload struct {
+		Email                   string `json:"email"`
+		PasswordHash            string `json:"password_hash"`
+		PreferredCurrency       string `json:"preferred_currency"`
+		DecimalPlaces           int    `json:"decimal_places"`
+		ThousandSeparator       string `json:"thousand_separator"`
+		CurrencySymbolPlacement string `json:"currency_symbol_placement"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
-	if u.Email == "" || u.PasswordHash == "" {
-		http.Error(w, "Email and passwordHash are required", http.StatusBadRequest)
+	if payload.Email == "" || payload.PasswordHash == "" || payload.PreferredCurrency == "" || payload.ThousandSeparator == "" || payload.CurrencySymbolPlacement == "" {
+		http.Error(w, "email, passwordHash, preferredCurrency, thousandSeparator, currencySymbolPlacement are required", http.StatusBadRequest)
 		return
 	}
-	created, err := h.UserRepo.CreateUser(u)
+	if !validation.IsValidCurrency(payload.PreferredCurrency) {
+		http.Error(w, "preferredCurrency must be a valid 3-letter currency code", http.StatusBadRequest)
+		return
+	}
+	if err := validation.ValidateNumberFormat(payload.PreferredCurrency, payload.DecimalPlaces, payload.ThousandSeparator, payload.CurrencySymbolPlacement); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	created, err := h.UserRepo.CreateUser(models.User{
+		Email:                   payload.Email,
+		PasswordHash:            payload.PasswordHash,
+		PreferredCurrency:       payload.PreferredCurrency,
+		DecimalPlaces:           payload.DecimalPlaces,
+		ThousandSeparator:       payload.ThousandSeparator,
+		CurrencySymbolPlacement: payload.CurrencySymbolPlacement,
+	})
 	if err != nil {
 		log.Printf("Error creating user: %v", err)
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
@@ -116,16 +138,38 @@ func (h *Handler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "id must be a valid UUID", http.StatusBadRequest)
 		return
 	}
-	var u models.User
-	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+	var payload struct {
+		Email                   string `json:"email"`
+		PasswordHash            string `json:"password_hash"`
+		PreferredCurrency       string `json:"preferred_currency"`
+		DecimalPlaces           int    `json:"decimal_places"`
+		ThousandSeparator       string `json:"thousand_separator"`
+		CurrencySymbolPlacement string `json:"currency_symbol_placement"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
-	if u.Email == "" || u.PasswordHash == "" {
-		http.Error(w, "Email and passwordHash are required", http.StatusBadRequest)
+	if payload.Email == "" || payload.PasswordHash == "" || payload.PreferredCurrency == "" || payload.ThousandSeparator == "" || payload.CurrencySymbolPlacement == "" {
+		http.Error(w, "email, passwordHash, preferredCurrency, thousandSeparator, currencySymbolPlacement are required", http.StatusBadRequest)
 		return
 	}
-	updated, err := h.UserRepo.UpdateUser(id, u)
+	if !validation.IsValidCurrency(payload.PreferredCurrency) {
+		http.Error(w, "preferredCurrency must be a valid 3-letter currency code", http.StatusBadRequest)
+		return
+	}
+	if err := validation.ValidateNumberFormat(payload.PreferredCurrency, payload.DecimalPlaces, payload.ThousandSeparator, payload.CurrencySymbolPlacement); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	updated, err := h.UserRepo.UpdateUser(id, models.User{
+		Email:                   payload.Email,
+		PasswordHash:            payload.PasswordHash,
+		PreferredCurrency:       payload.PreferredCurrency,
+		DecimalPlaces:           payload.DecimalPlaces,
+		ThousandSeparator:       payload.ThousandSeparator,
+		CurrencySymbolPlacement: payload.CurrencySymbolPlacement,
+	})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "User not found", http.StatusNotFound)

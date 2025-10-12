@@ -5,9 +5,12 @@ import PricePointsPage from '@/pages/PricePoints'
 import PriceStoriesPage from '@/pages/PriceStories'
 import PriceStoryDetailsPage from '@/pages/PriceStoryDetails'
 import LoginPage from '@/pages/Login'
+import NewPriceStoryPage from '@/pages/NewPriceStory'
+import ProfilePage from '@/pages/Profile'
 import { AuthProvider, useAuth } from '@/auth/AuthContext'
 import RequireAuth from '@/auth/RequireAuth'
 import { post } from '@/api/client'
+import type { User } from '@/types'
 
 function AppHeader() {
   const { user, logout } = useAuth()
@@ -30,6 +33,7 @@ function AppHeader() {
           <Link to="/products">Products</Link>
           <Link to="/price-points">Price Points</Link>
           <Link to="/price-stories">Price Stories</Link>
+          <Link to="/profile">Profile</Link>
         </nav>
       ) : null}
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -59,11 +63,22 @@ function HomeContent() {
     setError(null)
     try {
       const created = await post<
-        { email: string; password_hash: string },
-        { id: string; email: string; password_hash: string }
+        {
+          email: string
+          password_hash: string
+          preferred_currency: string
+          decimal_places: number
+          thousand_separator: string
+          currency_symbol_placement: 'before' | 'after'
+        },
+        User
       >('/users', {
         email,
-        password_hash: password
+        password_hash: password,
+        preferred_currency: 'USD',
+        decimal_places: 2,
+        thousand_separator: ',',
+        currency_symbol_placement: 'before'
       })
       login(created)
     } catch (e) {
@@ -148,6 +163,22 @@ function App() {
             <Route path="/price-points" element={<PricePointsPage />} />
             <Route path="/price-points/:productId" element={<PricePointsPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/profile"
+              element={
+                <RequireAuth>
+                  <ProfilePage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/price-stories/new"
+              element={
+                <RequireAuth>
+                  <NewPriceStoryPage />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/price-stories"
               element={
