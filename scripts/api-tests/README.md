@@ -7,10 +7,12 @@ Reusable bash scripts to exercise the Price Story API. Scripts create sample dat
 - `curl`
 - `jq`
 - API server running at `http://localhost:8080` (see container dev below)
+- Optional: frontend dev server at `http://localhost:5173` using `/api/*` proxy to backend
 
 ## Configuration
 
 - `API_BASE` (optional): Base API URL. Defaults to `http://localhost:8080/api`.
+- When using the frontend dev proxy, you can also target `http://localhost:5173/api` for the same behavior.
 
 ## Run All Endpoint Tests
 
@@ -63,3 +65,7 @@ make api-test-price-points
 - Cleanup (delete created resources)
 
 Each run generates unique emails and names, allowing repeated executions.
+
+## Notes
+
+- In container-first dev (`make docker-up`), the Vite dev server proxies `/api/*` and `/health` to the Go backend. `docker-compose.yml` sets `VITE_API_PROXY_TARGET` to `http://app:8080`.

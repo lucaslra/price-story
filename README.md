@@ -1,6 +1,6 @@
-# Price Story API
+# Price Story
 
-A Go API for tracking and analyzing price histories of products.
+A Go backend with a React + Vite frontend for tracking and analyzing product price histories. This README summarizes features, setup, development workflow, troubleshooting, and references. See `docs/` for expanded guides.
 
 ## Project Structure
 
@@ -16,6 +16,7 @@ price-story/
 │   ├── models/       # Data models
 │   ├── repository/   # Data access layer
 │   └── router/       # HTTP router setup
+├── docs/             # Documentation
 └── Makefile          # Build automation
 ```
 
@@ -57,7 +58,7 @@ make docker-logs
 make docker-down
 ```
 
-The server listens on `http://localhost:8080`. Migrations run automatically at startup.
+The backend listens on `http://localhost:8080`. Migrations run automatically at startup.
 
 ### Request Attribution
 
@@ -96,6 +97,7 @@ make run
 - `make run` - Start PostgreSQL and run the application locally
 - `make build` - Build the application binary
 - `make test` - Run tests
+- `make openapi-sync-check` - Validate OpenAPI spec and router synchronization
 - `make clean` - Clean build artifacts
 
 ## Frontend (React + Vite)
@@ -122,8 +124,9 @@ npm start
 ### Dev Proxy
 
 - The frontend expects the API at `http://localhost:8080`.
-- The dev server proxies requests from `/api/*` to the backend, configured in `frontend/vite.config.ts`.
-- The API client uses `API_BASE = '/api'`.
+- The dev server proxies requests from `/api/*` and `/health` to the backend, configured in `frontend/vite.config.ts`.
+- In Docker Compose, proxy target is set via `VITE_API_PROXY_TARGET` (defaults to `http://localhost:8080` when not set).
+- The frontend API client uses `API_BASE = '/api'`.
 
 ### Helpful Commands
 
@@ -170,3 +173,16 @@ Configure the application using these environment variables (PostgreSQL-only):
 | `WRITE_TIMEOUT` | HTTP write timeout | `15s` |
 
 Migrations are embedded and run automatically on startup. Use `make migrate-up`, `make migrate-down`, and `make migrate-status` for manual control.
+
+## Documentation
+
+- Overview: `docs/Overview.md`
+- Setup Guide: `docs/Setup.md`
+- Development Guide: `docs/Development.md`
+- Troubleshooting: `docs/Troubleshooting.md`
+- API Reference: `docs/API.md` (OpenAPI spec at `cmd/price-story/openapi/openapi.yaml`)
+  - Synchronization: run `make openapi-sync-check` to validate routes, methods, and parameters against the spec
+
+## Version History
+
+See `CHANGELOG.md` for a summary of notable changes.

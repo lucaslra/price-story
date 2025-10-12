@@ -1,7 +1,7 @@
 .PHONY: build run test clean db-up db-down db-logs db-reset migrate-up migrate-down migrate-status \
         docker-build docker-up docker-down docker-logs docker-restart \
         api-test api-test-users api-test-products api-test-price-stories api-test-price-points \
-        fmt lint env \
+        fmt lint env openapi-sync-check \
         frontend-install frontend-dev frontend-build frontend-test frontend-lint frontend-preview
 
 # Build the application
@@ -43,6 +43,10 @@ docker-restart:
 # Run tests
 test:
 	go test -v ./...
+
+# Validate OpenAPI spec synchronization with router
+openapi-sync-check:
+	go test -v ./pkg/openapi -run TestOpenAPI
 
 # Clean build artifacts
 clean:
