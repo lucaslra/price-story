@@ -1,0 +1,759 @@
+openapi: 3.1.0
+info:
+  title: Price Story API
+  version: 1.0.0
+  description: API for tracking products, price points, and price stories.
+servers:
+  - url: http://localhost:8080
+    description: Local server
+tags:
+  - name: Health
+    description: System health and status
+  - name: Users
+    description: Operations on users
+  - name: Products
+    description: Operations on products
+  - name: PriceStories
+    description: Operations on price stories
+  - name: PricePoints
+    description: Operations on price points
+paths:
+  /api/health:
+    get:
+      operationId: healthCheck
+      tags: [Health]
+      summary: Health check
+      description: Returns the health status of the API.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /api/users:
+    get:
+      operationId: listUsers
+      tags: [Users]
+      summary: List users
+      description: Retrieves all users.
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [Users]
+      summary: Create user
+      description: Creates a new user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/users/{id}:
+    get:
+      operationId: getUser
+      tags: [Users]
+      summary: Get user
+      description: Retrieves a single user by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      operationId: updateUser
+      tags: [Users]
+      summary: Update user
+      description: Updates an existing user by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      operationId: deleteUser
+      tags: [Users]
+      summary: Delete user
+      description: Deletes a user by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/products:
+    get:
+      operationId: listProducts
+      tags: [Products]
+      summary: List products
+      description: Retrieves all products.
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [Products]
+      summary: Create product
+      description: Creates a new product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreate"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/products/{id}:
+    get:
+      operationId: getProduct
+      tags: [Products]
+      summary: Get product
+      description: Retrieves a single product by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Product ID (UUID)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      operationId: updateProduct
+      tags: [Products]
+      summary: Update product
+      description: Updates an existing product by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Product ID (UUID)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdate"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      operationId: deleteProduct
+      tags: [Products]
+      summary: Delete product
+      description: Deletes a product by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Product ID (UUID)
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Product deleted
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/price-stories:
+    get:
+      operationId: listPriceStories
+      tags: [PriceStories]
+      summary: List price stories
+      description: Retrieves all price stories.
+      responses:
+        "200":
+          description: List of price stories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  priceStories:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PriceStory"
+    post:
+      operationId: createPriceStory
+      tags: [PriceStories]
+      summary: Create price story
+      description: Creates a new price story.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceStoryCreate"
+      responses:
+        "201":
+          description: Price story created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceStory"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/price-stories/{id}:
+    get:
+      operationId: getPriceStory
+      tags: [PriceStories]
+      summary: Get price story
+      description: Retrieves a single price story by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Price story ID (UUID)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Price story
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceStory"
+        "404":
+          description: Price story not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      operationId: updatePriceStory
+      tags: [PriceStories]
+      summary: Update price story
+      description: Updates an existing price story by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Price story ID (UUID)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceStoryUpdate"
+      responses:
+        "200":
+          description: Updated price story
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceStory"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Price story not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      operationId: deletePriceStory
+      tags: [PriceStories]
+      summary: Delete price story
+      description: Deletes a price story by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Price story ID (UUID)
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Price story deleted
+        "404":
+          description: Price story not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/price-points:
+    get:
+      operationId: listPricePoints
+      tags: [PricePoints]
+      summary: List price points
+      description: Retrieves all price points.
+      responses:
+        "200":
+          description: List of price points
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pricePoints:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PricePoint"
+    post:
+      operationId: createPricePoint
+      tags: [PricePoints]
+      summary: Create price point
+      description: Creates a new price point.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PricePointCreate"
+      responses:
+        "201":
+          description: Price point created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PricePoint"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/price-points/{id}:
+    get:
+      operationId: getPricePoint
+      tags: [PricePoints]
+      summary: Get price point
+      description: Retrieves a single price point by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Price point ID (UUID)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Price point
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PricePoint"
+        "404":
+          description: Price point not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      operationId: updatePricePoint
+      tags: [PricePoints]
+      summary: Update price point
+      description: Updates an existing price point by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Price point ID (UUID)
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PricePointUpdate"
+      responses:
+        "200":
+          description: Updated price point
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PricePoint"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Price point not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      operationId: deletePricePoint
+      tags: [PricePoints]
+      summary: Delete price point
+      description: Deletes a price point by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Price point ID (UUID)
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Price point deleted
+        "404":
+          description: Price point not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        password_hash:
+          type: string
+    UserCreate:
+      type: object
+      required: [email, password_hash]
+      properties:
+        email:
+          type: string
+          format: email
+        password_hash:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+        product_url:
+          type: string
+          format: uri
+        created_by_user:
+          $ref: "#/components/schemas/User"
+        updated_by_user:
+          allOf:
+            - $ref: "#/components/schemas/User"
+          nullable: true
+        created_datetime:
+          type: string
+          format: date-time
+        updated_datetime:
+          type: string
+          format: date-time
+    ProductCreate:
+      type: object
+      required: [product_name, product_url]
+      properties:
+        product_name:
+          type: string
+        product_url:
+          type: string
+          format: uri
+    PriceStory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        product:
+          $ref: "#/components/schemas/Product"
+        created_by_user:
+          $ref: "#/components/schemas/User"
+        updated_by_user:
+          allOf:
+            - $ref: "#/components/schemas/User"
+          nullable: true
+        created_datetime:
+          type: string
+          format: date-time
+        updated_datetime:
+          type: string
+          format: date-time
+    PriceStoryCreate:
+      type: object
+      required: [product_id]
+      properties:
+        product_id:
+          type: string
+          format: uuid
+    PricePoint:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        price:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+        product:
+          $ref: "#/components/schemas/Product"
+        created_by_user:
+          $ref: "#/components/schemas/User"
+        updated_by_user:
+          allOf:
+            - $ref: "#/components/schemas/User"
+          nullable: true
+        created_datetime:
+          type: string
+          format: date-time
+        updated_datetime:
+          type: string
+          format: date-time
+    PricePointCreate:
+      type: object
+      required: [price, timestamp, product_id]
+      properties:
+        price:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+        product_id:
+          type: string
+          format: uuid
+    UserUpdate:
+      type: object
+      required: [email, password_hash]
+      properties:
+        email:
+          type: string
+          format: email
+        password_hash:
+          type: string
+    ProductUpdate:
+      type: object
+      required: [product_name, product_url]
+      properties:
+        product_name:
+          type: string
+        product_url:
+          type: string
+          format: uri
+    PriceStoryUpdate:
+      type: object
+      required: [product_id]
+      properties:
+        product_id:
+          type: string
+          format: uuid
+    PricePointUpdate:
+      type: object
+      required: [price, timestamp, product_id]
+      properties:
+        price:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+        product_id:
+          type: string
+          format: uuid

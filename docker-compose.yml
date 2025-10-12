@@ -1,0 +1,44 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: price-story-app
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      READ_TIMEOUT: 10s
+      WRITE_TIMEOUT: 10s
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: price_story_user
+      DB_PASSWORD: price_story_password
+      DB_NAME: price_story
+      DB_SSLMODE: disable
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:15-alpine
+    container_name: price-story-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: price_story
+      POSTGRES_USER: price_story_user
+      POSTGRES_PASSWORD: price_story_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U price_story_user -d price_story"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
