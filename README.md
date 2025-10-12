@@ -98,6 +98,61 @@ make run
 - `make test` - Run tests
 - `make clean` - Clean build artifacts
 
+## Frontend (React + Vite)
+
+The project includes a small React + TypeScript frontend in `frontend/` that consumes the API and renders products.
+
+### Quick Start
+
+```bash
+# Install dependencies
+make frontend-install
+
+# Start the Vite dev server (http://localhost:5173)
+make frontend-dev
+```
+
+Alternatively, from the `frontend/` directory:
+
+```bash
+npm install
+npm start
+```
+
+### Dev Proxy
+
+- The frontend expects the API at `http://localhost:8080`.
+- The dev server proxies requests from `/api/*` to the backend, configured in `frontend/vite.config.ts`.
+- The API client uses `API_BASE = '/api'`.
+
+### Helpful Commands
+
+```bash
+# In the repo root
+make frontend-test     # Run Vitest
+make frontend-lint     # Run ESLint
+make frontend-build    # Type-check and build
+make frontend-preview  # Preview the production build
+```
+
+### Seed Bogus Data
+
+You can quickly seed some products to see real data in the UI:
+
+```bash
+# Backend should be running (via make run or make docker-up)
+bash scripts/seed-products.sh         # default 8 products
+bash scripts/seed-products.sh 12      # custom count
+
+# If your API is on a different host/port
+API_BASE=http://localhost:8080/api bash scripts/seed-products.sh 10
+```
+
+### Notes
+
+- TypeScript is pinned to `5.5.x` to align with `@typescript-eslint` support.
+- If `npm install` warns about vulnerabilities, they don’t affect dev usage. Run `npm audit fix` if desired.
+
 ## Environment Variables
 
 Configure the application using these environment variables (PostgreSQL-only):

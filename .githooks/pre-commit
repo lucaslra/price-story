@@ -31,6 +31,34 @@ fi
 echo "Running golangci-lint ..."
 golangci-lint run ./...
 
+# Run frontend formatting and linting when staged changes include the frontend
+echo "Checking for frontend changes to run format + lint ..."
+if [ -d "frontend" ]; then
+  staged_frontend=$(git diff --cached --name-only --diff-filter=ACM | grep '^frontend/' || true)
+  if [ -n "$staged_frontend" ]; then
+    if command -v npm >/dev/null 2>&1; then
+      if [ -d "frontend/node_modules" ]; then
+        (
+          cd frontend
+          echo "Formatting frontend with Prettier ..."
+          npm run format --silent
+          # Re-add any formatting changes
+          git add .
+          echo "Linting frontend with ESLint ..."
+          npm run lint
+        )
+      else
+        echo "Skipping frontend lint/format (frontend/node_modules missing)."
+        echo "Run 'cd frontend && npm install' to enable frontend hooks."
+      fi
+    else
+      echo "npm not found in PATH; skipping frontend lint/format."
+    fi
+  else
+    echo "No staged frontend changes detected."
+  fi
+fi
+
 # Run tests using Makefile target if available, fallback to 'go test'
 echo "Running tests ..."
 if command -v make >/dev/null 2>&1 && grep -qE '^test:' Makefile 2>/dev/null; then

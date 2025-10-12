@@ -1,7 +1,8 @@
 .PHONY: build run test clean db-up db-down db-logs db-reset migrate-up migrate-down migrate-status \
         docker-build docker-up docker-down docker-logs docker-restart \
         api-test api-test-users api-test-products api-test-price-stories api-test-price-points \
-        fmt lint env
+        fmt lint env \
+        frontend-install frontend-dev frontend-build frontend-test frontend-lint frontend-preview
 
 # Build the application
 build:
@@ -125,3 +126,22 @@ api-test-price-stories:
 
 api-test-price-points:
 	@bash ./scripts/api-tests/price_points.sh
+
+# --- Frontend helpers ---
+frontend-install:
+	cd frontend && npm install
+
+frontend-dev:
+	cd frontend && npm run dev
+
+frontend-build:
+	cd frontend && npm run build
+
+frontend-test:
+	cd frontend && npm test
+
+frontend-lint:
+	cd frontend && npm run lint
+
+frontend-preview:
+	cd frontend && npm run preview
